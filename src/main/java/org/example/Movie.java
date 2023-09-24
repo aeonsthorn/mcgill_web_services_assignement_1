@@ -25,6 +25,10 @@ public class Movie implements Serializable {
         this.ImdbId = ImdbId;
     }
 
+    public void setDescription(String description){
+        this.Description = description;
+    }
+
     @Override
     public String toString() {
         return "Movie{" +
