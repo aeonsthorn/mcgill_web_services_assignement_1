@@ -29,21 +29,19 @@ public class MovieServlet extends HttpServlet {
         String movieId = req.getParameter("id");
 
         if (movieId == null) {
-            String strMovies = "[";
+            StringBuilder strMovies = new StringBuilder("[");
 
-            for (int i = 0; i < this.movies.size(); i++) {
-                strMovies += this.movies.get(i).toString();
+            for (Movie movie : this.movies) {
+                strMovies.append(movie.toString());
             }
 
-            resp.getWriter().write(strMovies + ']');
+            resp.getWriter().write(strMovies.toString() + ']');
             return;
 
         }
 
 
-        for (int i = 0; i < this.movies.size(); i++) {
-
-            Movie movie = this.movies.get(i);
+        for (Movie movie : this.movies) {
 
             if (movie.getImdbId().equals(movieId)) {
 
@@ -59,7 +57,7 @@ public class MovieServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws  IOException {
 
         System.out.println(req.getParameter("ImdbId"));
 
@@ -123,9 +121,7 @@ public class MovieServlet extends HttpServlet {
 
     private Movie getMovieById(String id) {
 
-        for (int i = 0; i < this.movies.size(); i++) {
-
-            Movie movie = this.movies.get(i);
+        for (Movie movie : this.movies) {
 
             if (movie.getImdbId().equals(id)) {
 
