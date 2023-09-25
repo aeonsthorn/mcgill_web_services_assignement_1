@@ -10,13 +10,11 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-
 public class MovieServlet extends HttpServlet {
 
     List<Movie> movies = Collections.synchronizedList(new ArrayList<>());
 
-    public MovieServlet() {
-    }
+    public MovieServlet() {}
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -47,6 +45,7 @@ public class MovieServlet extends HttpServlet {
 
             }
         }
+
 
 
         resp.setStatus(404);
