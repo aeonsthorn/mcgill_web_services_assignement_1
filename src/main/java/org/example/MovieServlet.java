@@ -2,9 +2,6 @@ package org.example;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,9 +9,11 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class MovieServlet extends HttpServlet {
 
-    List<Movie> movies = Collections.synchronizedList(new ArrayList<>());
+    private final MovieRepository movieRepository;
 
-    public MovieServlet() {}
+    public MovieServlet() {
+        movieRepository = new MovieRepository();
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -24,7 +23,7 @@ public class MovieServlet extends HttpServlet {
         if (movieId == null) {
             StringBuilder strMovies = new StringBuilder();
 
-            for (Movie movie : this.movies) {
+            for (Movie movie : this.movieRepository.getAll()) {
                 strMovies.append(movie.toString());
                 strMovies.append("\n");
             }
@@ -36,16 +35,12 @@ public class MovieServlet extends HttpServlet {
         }
 
 
-        for (Movie movie : this.movies) {
+        Movie movie = movieRepository.getOneById(movieId);
 
-            if (movie.getImdbId().equals(movieId)) {
-
-                resp.getWriter().write(movie.toString());
-                return;
-
-            }
+        if (movie != null) {
+            resp.getWriter().write(movie.toString());
+            return;
         }
-
 
 
         resp.setStatus(404);
@@ -64,7 +59,7 @@ public class MovieServlet extends HttpServlet {
         String Year = req.getParameter("Year");
 
 
-        Movie existingMovieWithSameId = this.getMovieById(ImdbId);
+        Movie existingMovieWithSameId = this.movieRepository.getOneById(ImdbId);
 
         if (existingMovieWithSameId != null) {
             resp.setStatus(HttpServletResponse.SC_CONFLICT);
@@ -119,7 +114,7 @@ public class MovieServlet extends HttpServlet {
         movie.updateLastModified();
 
 
-        this.movies.add(movie);
+        this.movieRepository.add(movie);
 
         resp.getWriter().write(movie.toString());
 
@@ -132,7 +127,7 @@ public class MovieServlet extends HttpServlet {
         String movieId = req.getParameter("ImdbId");
 
 
-        Movie movie = this.getMovieById(movieId);
+        Movie movie = this.movieRepository.getOneById(movieId);
 
         if (movie == null) {
             resp.setStatus(404);
@@ -197,9 +192,13 @@ public class MovieServlet extends HttpServlet {
 
         movie.updateLastModified();
 
+        this.movieRepository.update(movie);
+
         resp.getWriter().write(movie.toString());
 
     }
+
+
 
 
     @Override
@@ -207,7 +206,7 @@ public class MovieServlet extends HttpServlet {
 
         String movieId = req.getParameter("ImdbId");
 
-        Movie movie = this.getMovieById(movieId);
+        Movie movie = this.movieRepository.getOneById(movieId);
 
         if (movie == null) {
 
@@ -218,7 +217,7 @@ public class MovieServlet extends HttpServlet {
         }
 
 
-        this.movies.remove(movie);
+        this.movieRepository.remove(movieId);
 
         resp.getWriter().write("Ok");
 
@@ -226,19 +225,6 @@ public class MovieServlet extends HttpServlet {
     }
 
 
-    private Movie getMovieById(String id) {
 
-        for (Movie movie : this.movies) {
-
-            if (movie.getImdbId().equals(id)) {
-
-                return movie;
-
-            }
-        }
-
-        return null;
-
-    }
 }
 
